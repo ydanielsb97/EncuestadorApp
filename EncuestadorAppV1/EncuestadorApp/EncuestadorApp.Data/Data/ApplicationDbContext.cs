@@ -1,8 +1,9 @@
 ﻿using EncuestadorApp.Data;
+using EncuestadorApp.Data.Models;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
-namespace EncuestadorApp.Logic1.Data
+namespace EncuestadorApp.Data.Data
 {
     public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     {
@@ -10,5 +11,9 @@ namespace EncuestadorApp.Logic1.Data
             : base(options)
         {
         }
+
+        public DbSet<Encuesta> Encuestas { get; set; }
+        public DbSet<Pregunta> Preguntas { get; set; }
+        public DbSet<Respuesta> Respuestas { get; set; }
     }
 }

@@ -12,6 +12,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using EncuestadorApp.Data.Data;
 using EncuestadorApp.Data;
 
 namespace EncuestadorApp.Logic1
