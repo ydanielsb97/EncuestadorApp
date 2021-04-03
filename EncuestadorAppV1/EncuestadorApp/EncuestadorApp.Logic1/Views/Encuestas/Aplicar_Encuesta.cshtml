@@ -1,0 +1,251 @@
+﻿
+@{
+    ViewData["Title"] = "Aplicar Encuesta";
+}
+
+<h2 class="mb-4 ml-3">Aplicar Encuesta</h2>
+
+
+<div class="row">
+
+    <div class="col-12" id="Encuestas_Div">
+        <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status">
+            <span class="sr-only">Loading...</span>
+        </div>
+        @*<div class="col-12">
+                <a class="btn btn-light btn-block mb-3">Encuesta #1</a>
+            </div>
+            <div class="col-12">
+                <a class="btn btn-light btn-block mb-3">Encuesta #1</a>
+            </div>
+            <div class="col-12">
+                <a class="btn btn-light btn-block mb-3">Encuesta #1</a>
+            </div>*@
+    </div>
+</div>
+
+
+<div class="modal fade" id="Modal_Ver_Encuesta" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="Modal_Ver_EncuestaLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="Modal_Ver_EncuestaLabel"></h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+
+                <div></div>
+
+                <div id="Div_Preguntas_Encuesta">
+
+                    <ol id="Lista_Preguntas">
+
+                    </ol>
+
+
+
+                </div>
+
+
+            </div>
+            <div class="modal-footer" id="Footer_Ver_Encuesta">
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Cerrar</button>
+                <button onclick="Abrir_Aplicar_Encuesta()" type="submit" class="btn btn-success" data-dismiss="modal" data-toggle="modal" data-target="#Modal_Aplicar_Encuesta" form="Form_Preguntas">Aplicar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<div class="modal fade" id="Modal_Aplicar_Encuesta" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="Modal_Aplicar_EncuestaLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="Modal_Aplicar_EncuestaLabel">Aplicar encuesta</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+
+                <form id="Form_Aplicar_Encuesta">
+
+                    <div>
+                        <b><label for="Nombre_Encuestado">Nombre Completo</label></b>
+                        <input class="form-control" type="text" name="Nombre_Encuestado" id="Nombre_Encuestado" placeholder="Escriba su nombre completo" required />
+                    </div>
+
+                    <hr />
+                    <h4 class="mb-3">Responda las siguientes preguntas:</h4>
+                    <div  style="max-height: 500px; overflow-y: scroll;">
+                        <ol class="pl-3 pr-5" id="Ol_Preguntas_Respuestas">
+
+                        </ol>
+                    </div>
+
+                </form>
+
+
+            </div>
+            <div class="modal-footer">
+                <button id="Btn_Enviar" type="submit" class="btn btn-success" form="Form_Aplicar_Encuesta">Enviar Respuestas</button>
+                <button id="Loading_Enviar" class="btn btn-success" type="button" disabled hidden>
+                    <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                    Enviar Respuestas...
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+@section Scripts{
+
+    <script>
+        $(document).ready(function () {
+
+            Obtener_Encuestas()
+
+        });
+
+        var Encuestas = [];
+
+        var Preguntas_Aplicar = [];
+
+        var Encuesta_Seleccionada_ID;
+
+        var Cantidad_Preguntas;
+
+        
+
+        $("#Form_Aplicar_Encuesta").submit(function () {
+
+            //$("#Btn_Enviar").attr("hidden", true);
+            //$("#Loading_Enviar").removeAttr("hidden");
+
+            var Lista_Respuestas = []
+
+            $.each(Preguntas_Aplicar, function (i, item) {
+
+                var respuesta = { Pregunta: item.descripcion, Respuesta_Text: $(`#Respuesta${ i + 1}`).val() };
+
+                Lista_Respuestas.push(respuesta);
+
+            });
+
+            var data = { Nombre_Usuario: $("#Nombre_Encuestado").val(), Encuesta_ID: Encuesta_Seleccionada_ID, Respuestas: Lista_Respuestas }
+
+
+            $.get("/Encuestas/Enviar_Respuestas", data).done(function (result) {
+
+                Swal.fire({
+
+                    title: result.title,
+                    text: result.text,
+                    icon: result.icon
+
+                })
+
+                $("#Loading_Enviar").attr("hidden", true);
+                $("#Btn_Enviar").removeAttr("hidden");
+            })
+
+
+            $("#Loading_Enviar").attr("hidden", true);
+            $("#Btn_Enviar").removeAttr("hidden");
+
+            $("#Modal_Aplicar_Encuesta").modal("hide");
+
+            return false;
+        })
+
+        function Obtener_Encuestas() {
+
+            $.get("/Encuestas/Obtener_Encuesta").done(function (result) {
+
+                console.log(result.lista_Encuestas);
+
+                Encuestas = result.lista_Encuestas;
+
+                $("#Encuestas_Div").html("");
+
+
+                $.each(result.lista_Encuestas, function (i, item) {
+                    var fecha = moment(item.fecha_Creacion).format("lll");
+
+                    var model = `
+                                <div class="col-12">
+                                     <button onclick="Preguntas_Encuesta(${item.id})" class="btn btn-success btn-block mb-3">Encuesta #${i + 1} - ${item.titulo} - ${fecha}</a>
+                                </div>`;
+
+
+                    $("#Encuestas_Div").append(model);
+
+
+                });
+
+
+
+            })
+
+        }
+
+        function Preguntas_Encuesta(Id_Encuestas) {
+
+            Encuesta_Seleccionada_ID = Id_Encuestas;
+
+            var data = { Id_Encuestas: Id_Encuestas }
+
+            $("#Lista_Preguntas").html("");
+
+            $.get("/Encuestas/Preguntas_Encuesta", data).done(function (result) {
+
+                Preguntas_Aplicar = result.preguntas;
+
+                console.log(result);
+                $.each(result.preguntas, function (i, item) {
+
+                    var model = `
+                            <b><li>${item.descripcion}</li></b>`;
+
+                    $("#Lista_Preguntas").append(model);
+
+                });
+
+            });
+            console.log(Encuestas)
+
+            var encuesta = Encuestas.find(x => x.id == Id_Encuestas);
+
+            $("#Modal_Ver_EncuestaLabel").text(encuesta.titulo);
+
+            $("#Modal_Ver_Encuesta").modal("show");
+        }
+
+        function Abrir_Aplicar_Encuesta() {
+            $("#Ol_Preguntas_Respuestas").html("");
+            
+            $.each(Preguntas_Aplicar, function (i, item) {
+
+
+
+                var pregunta = `
+                        <li>
+                            ${item.descripcion}
+                            <textarea class="form-control" type="text" name="name" id="Respuesta${i + 1}" placeholder="Respuesta" required/></textarea>
+                        </li>`;
+                        
+                $("#Ol_Preguntas_Respuestas").append(pregunta);
+
+            });
+
+            Cantidad_Preguntas = Preguntas_Aplicar.length;
+
+            $("#Modal_Ver_Encuesta").modal("hide");
+            $("#Modal_Aplicar_Encuesta").modal("show");
+
+        }
+    </script>
+
+} 

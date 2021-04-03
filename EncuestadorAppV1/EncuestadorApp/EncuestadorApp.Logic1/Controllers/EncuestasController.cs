@@ -26,6 +26,16 @@ namespace EncuestadorApp.Logic1.Controllers
             return View();
         }
 
+        public IActionResult Visualizar_Encuesta()
+        {
+            return View();
+        }
+
+        public IActionResult Aplicar_Encuesta()
+        {
+            return View();
+        }
+
         public JsonResult Crear_Encuesta(List<Pregunta_Form> Lista_Preguntas)
         {
             var Usuario_Loguedo = db.Users.Find(User.FindFirstValue(ClaimTypes.NameIdentifier));
@@ -57,8 +67,6 @@ namespace EncuestadorApp.Logic1.Controllers
 
             return Json(new { title = "Encuesta", text = "Encuesta creada exitósamente", icon = "success" });
         }
-
-
         public JsonResult Guardar_Edicion_Encuesta(int Encuesta_ID, List<Pregunta> Lista_Preguntas)
         {
             var Usuario_Loguedo = db.Users.Find(User.FindFirstValue(ClaimTypes.NameIdentifier));
@@ -138,6 +146,29 @@ namespace EncuestadorApp.Logic1.Controllers
             return Json(new { Lista_Encuestas });
         }
 
+        public JsonResult Obtener_Encuestas_Respondidas()
+        {
+
+
+            var Lista_Encuestas = db.Encuestas.Include(x => x.Respuestas)
+                .Select(x => new Encuesta
+                {
+                    ID = x.ID,
+                    Fecha_Creacion = x.Fecha_Creacion,
+                    Titulo = x.Titulo,
+                    Respuestas = (List<Respuesta_Por_Usuario>)x.Respuestas.Select(x => new Respuesta_Por_Usuario { 
+                        ID = x.ID,
+                        Nombre_Encuestado = x.Nombre_Encuestado,
+                        Fecha_Completada = x.Fecha_Completada,
+                        Get_Respuestas = (List<Respuesta>)x.Get_Respuestas.Select(x => new Respuesta { Pregunta = x.Pregunta, Respuesta_Text = x.Respuesta_Text})
+                        
+                    })
+
+                }).ToList();
+
+            return Json(new { Lista_Encuestas });
+        }
+
         public JsonResult Preguntas_Encuesta(int Id_Encuestas)
         {
 
@@ -148,7 +179,6 @@ namespace EncuestadorApp.Logic1.Controllers
 
             return Json(new { preguntas });
         }
-
         public JsonResult Elimnar_Encuesta (int Id_Encuestas)
         {
             var encuesta = db.Encuestas.Find(Id_Encuestas);
@@ -167,6 +197,38 @@ namespace EncuestadorApp.Logic1.Controllers
             }
 
         }
+        public JsonResult Enviar_Respuestas(string Nombre_Usuario, int Encuesta_ID, List<Respuesta> Respuestas)
+        {
+
+            var Respuestas_Por_Usuario = new Respuesta_Por_Usuario
+            {
+                Fecha_Completada = DateTime.Now,
+                Nombre_Encuestado = Nombre_Usuario,
+                Encuesta_ID = Encuesta_ID
+            };
+
+            db.Respuestas_Por_Usuario.Add(Respuestas_Por_Usuario);
+            db.SaveChanges();
+
+            foreach (var item in Respuestas)
+            {
+                var model = new Respuesta
+                {
+                    Respuestas_ID = Respuestas_Por_Usuario.ID,
+                    Pregunta = item.Pregunta,
+                    Respuesta_Text = item.Respuesta_Text
+                };
+
+                db.Respuestas.Add(model);
+                db.SaveChanges();
+            }
+
+
+
+            return Json(new { title = "Encuestas", text = "Sus respuestas fueron enviadas exitósamente", icon = "success" });
+        }
+
+        
 
 
     }

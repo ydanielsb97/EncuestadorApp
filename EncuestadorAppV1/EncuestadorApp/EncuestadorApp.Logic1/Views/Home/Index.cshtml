@@ -26,15 +26,18 @@
     <h4 class="mb-4">Lista de Encuestas</h4>
 
     <div class="col-12" id="Encuestas_Div">
+        <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status">
+            <span class="sr-only">Loading...</span>
+        </div>
         @*<div class="col-12">
-                <a class="btn btn-light btn-block mb-3">Encuesta #1</a>
-            </div>
-            <div class="col-12">
-                <a class="btn btn-light btn-block mb-3">Encuesta #1</a>
-            </div>
-            <div class="col-12">
-                <a class="btn btn-light btn-block mb-3">Encuesta #1</a>
-            </div>*@
+            <a class="btn btn-light btn-block mb-3">Encuesta #1</a>
+        </div>
+        <div class="col-12">
+            <a class="btn btn-light btn-block mb-3">Encuesta #1</a>
+        </div>
+        <div class="col-12">
+            <a class="btn btn-light btn-block mb-3">Encuesta #1</a>
+        </div>*@
     </div>
 </div>
 
@@ -142,15 +145,16 @@
                 </div>
 
                 <hr />
-                <div class="row" id="Div_Editar_Encuesta" style="max-height:500px; overflow-y:scroll;">
+                <form id="Form_Editar">
+                    <div class="row" id="Div_Editar_Encuesta" style="max-height:500px; overflow-y:scroll;">
 
 
-                </div>
-
+                    </div>
+                </form>
             </div>
             <div class="modal-footer" id="Footer_Ver_Encuesta">
                 <button type="button" class="btn btn-danger" data-dismiss="modal">Cancelar</button>
-                <button onclick="Editar_Encuesta()" type="button" class="btn btn-success" form="Form_Preguntas">Guardar</button>
+                <button type="submit" class="btn btn-success" form="Form_Editar">Guardar</button>
             </div>
         </div>
     </div>
@@ -228,6 +232,14 @@
 
             return false;
         })
+
+        $("#Form_Editar").submit(function () {
+
+            Editar_Encuesta()
+
+            return false;
+
+        });
 
         function Obtener_Encuestas() {
 
@@ -334,7 +346,8 @@
                     <div class="row">
                      <div class="col-10">
                         <label for="Pregunta${i + 1}">Pregunta #${i + 1}</label>
-                        <input class="form-control" value="${item.descripcion}" name="PreguntaInput${i + 1}" id="PreguntaInput${i + 1}" required>
+                        <input class="form-control" onFocusout="Cambiar_Valor(${item.id}, PreguntaInput${i + 1})" value="${item.descripcion}" name="PreguntaInput${i + 1}" id="PreguntaInput${i + 1}" required>
+
                       </div>
                     <div class="col-2" style="margin-top: 32px;">
                         <button class="btn btn-danger" onclick="Eliminar_Pregunta(Div_Pregunta${i + 1}, ${item.id})">Eliminar</buttom>
@@ -370,6 +383,8 @@
 
             var data = { Encuesta_ID: Encuesta_A_Editar, Lista_Preguntas: Preguntas_Edit };
             console.log(data)
+
+            console.log(data);
 
             $.post("/Encuestas/Guardar_Edicion_Encuesta", data).done(function (result) {
 
@@ -446,7 +461,7 @@
                     <div class="row">
                      <div class="col-10">
                         <label for="Pregunta${i + 1}">Pregunta #${i + 1}</label>
-                        <input class="form-control" value="${item.descripcion}" name="PreguntaInput${i + 1}" id="PreguntaInput${i + 1}" required>
+                        <input class="form-control pregunta" onFocusout="Cambiar_Valor(${item.id}, PreguntaInput${i + 1})" value="${item.descripcion}" name="PreguntaInput${i + 1}" id="PreguntaInput${i + 1}" required>
                       </div>
                     <div class="col-2" style="margin-top: 32px;">
                         <button class="btn btn-danger" onclick="Eliminar_Pregunta(Div_Pregunta${i + 1}, ${item.id})">Eliminar</buttom>
@@ -463,6 +478,22 @@
             });
 
         }
+
+        function Cambiar_Valor(Pregunta_ID, input) {
+            var Campo_Cambiado = $(input);
+
+
+            console.log(Campo_Cambiado)
+            var pregunta = Preguntas_Edit.findIndex(x => x.id == Pregunta_ID);
+
+            Preguntas_Edit[pregunta].descripcion = Campo_Cambiado.val();
+
+            console.log(Preguntas_Edit);
+
+        };
+
+
+
     </script>
 
 

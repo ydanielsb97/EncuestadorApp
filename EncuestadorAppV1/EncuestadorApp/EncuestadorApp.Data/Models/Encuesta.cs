@@ -15,6 +15,7 @@ namespace EncuestadorApp.Data.Models
         public string Creador_Nombre { get; set; }
         public DateTime Fecha_Creacion { get; set; }
         public List<Pregunta> Preguntas { get; set; }
+        public List<Respuesta_Por_Usuario> Respuestas { get; set; }
     }
 
     public class Pregunta
@@ -25,18 +26,33 @@ namespace EncuestadorApp.Data.Models
         public int Encuesta_ID { get; set; }
         [ForeignKey("Encuesta_ID")]
         public Encuesta GetEncuesta { get; set; }
-        public List<Respuesta> Respuestas { get; set; }
 
     }
 
-    public class Respuesta 
+    public class Respuesta_Por_Usuario
     {
         [Key]
         public int ID { get; set; }
-        public string Descripcion { get; set; }
-        public int Pregunta_ID { get; set; }
-        [ForeignKey("Pregunta_ID")]
-        public Pregunta GetPregunta { get; set; }
+        public string Nombre_Encuestado { get; set; }
+        public DateTime Fecha_Completada { get; set; }
+        public int Encuesta_ID { get; set; }
+
+        [ForeignKey("Encuesta_ID")]
+        public Encuesta GetEncuesta { get; set; }
+        public List<Respuesta> Get_Respuestas { get; set; }
+
+    }
+
+    public class Respuesta
+    {
+        [Key]
+        public int ID { get; set; }
+        public string Pregunta { get; set; }
+        public string Respuesta_Text { get; set; }
+        public int Respuestas_ID { get; set; }
+        [ForeignKey("Respuestas_ID")]
+        public Respuesta_Por_Usuario GetRespuesta { get; set; }
+
     }
 
     public class Pregunta_Form
