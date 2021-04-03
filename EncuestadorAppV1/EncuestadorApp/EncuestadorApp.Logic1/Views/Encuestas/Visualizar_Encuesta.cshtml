@@ -5,3 +5,221 @@
 
 <h1>Visualizar Encuestas</h1>
 
+
+<div class="row">
+
+    <div class="col-12" id="Encuestas_Div">
+        <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status">
+            <span class="sr-only">Loading...</span>
+        </div>
+        @*<div class="col-12">
+                <a class="btn btn-light btn-block mb-3">Encuesta #1</a>
+            </div>
+            <div class="col-12">
+                <a class="btn btn-light btn-block mb-3">Encuesta #1</a>
+            </div>
+            <div class="col-12">
+                <a class="btn btn-light btn-block mb-3">Encuesta #1</a>
+            </div>*@
+    </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="Modal_Visualizar_Encuesta" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="Modal_Visualizar_Encuesta_EncuestaLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="Modal_Visualizar_EncuestaLabel">Respuestas de Encuestas</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <h5>Usuarios Encuestados</h5>
+                <div id="Lista_Usuarios_Encuestados" class="row" style="max-height: 500px; overflow-y: scroll;">
+
+                    <div class="col-10 mb-3">
+                        <button class="btn btn-light">Yeison Serrano - Completada el 03/04/2021</button>
+                    </div>
+
+                    <div class="col-7 mb-3">
+                        <button class="btn btn-light">Yeison Serrano - Completada el 03/04/2021</button>
+                    </div>
+                    <div class="col-7 mb-3">
+                        <button class="btn btn-light">Yeison Serrano - Completada el 03/04/2021</button>
+                    </div>
+                    <div class="col-7 mb-3">
+                        <button class="btn btn-light">Yeison Serrano - Completada el 03/04/2021</button>
+                    </div>
+                    <div class="col-7 mb-3">
+                        <button class="btn btn-light">Yeison Serrano - Completada el 03/04/2021</button>
+                    </div>
+
+
+                </div>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="Modal_Respuestas_Usuario" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="Modal_Respuestas_UsuarioLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="Modal_Respuestas_UsuarioLabel">Respuestas de Encuestas</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-12">
+                        <div>
+                            <label><b>Usuario Encuestado:</b></label>
+                            <span id="Usuario_Encuestado"></span>
+                        </div>
+                        <div>
+                            <label><b>Fecha de Envío:</b></label>
+                            <span id="Fecha_De_Envio"></span>
+                        </div>
+                    </div>
+                
+
+                    <div class="col-12">
+                        <hr />
+                        <ol id="Lista_Respuestas_Usuario">
+                            <li>
+                                <b><label>¿Quién es Yeison?</label></b>
+                                <p><q>La para</q></p>
+                            </li>
+                            <li>
+                                <b><label>¿Quién es Yeison?</label></b>
+                                <p><q>La para</q></p>
+                            </li>
+                            <li>
+                                <b><label>¿Quién es Yeison?</label></b>
+                                <p><q>La para</q></p>
+                            </li>
+                        </ol>
+                       
+
+                    </div>
+
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn btn-success" data-dismiss="modal" data-toggle="modal", data-target="#Modal_Visualizar_Encuesta">Volver</button>
+            </div>
+        </div>
+    </div>
+</div>
+@section Scripts{
+
+    <script>
+
+        $(document).ready(function () {
+
+            Obtener_Encuestas();
+
+        });
+
+        var Encuestas = [];
+        var Encuesta_Elegida;
+
+        function Obtener_Encuestas() {
+
+            $("#Lista_Usuarios_Encuestados").html("");
+
+            $.get("/Encuestas/Obtener_Encuestas_Respondidas").done(function (result) {
+
+                console.log(result.lista_Encuestas);
+
+                Encuestas = result.lista_Encuestas;
+
+                $("#Encuestas_Div").html("");
+
+
+                $.each(result.lista_Encuestas, function (i, item) {
+                    var fecha = moment(item.fecha_Creacion).format("lll");
+
+                    var model = `
+                                <div class="col-12">
+                                     <button onclick="Ver_Usuarios_Encuestados(${item.id})" class="btn btn-primary btn-block mb-3">Encuesta #${i + 1} - ${item.titulo} - ${fecha}</button>
+                                </div>`;
+
+
+                    $("#Encuestas_Div").append(model);
+
+
+                });
+
+
+
+            })
+
+        }
+
+
+
+        function Ver_Usuarios_Encuestados(Encuesta_ID) {
+
+            var Datos_Respuestas = Encuestas.find(x => x.id == Encuesta_ID);
+
+
+            $("#Lista_Usuarios_Encuestados").html("");
+            $.each(Datos_Respuestas.respuestas, function (i, item) {
+
+                var boton = `
+                        <div class="col-11 mb-3">
+                            <button onclick="Ver_Respuestas_De_Usuario(${item.id})" class="btn btn-light w-100">${item.nombre_Encuestado} - Completada el ${moment(item.fecha_Completada).format("lll")}</button>
+                        </div>`;
+
+                $("#Lista_Usuarios_Encuestados").append(boton);
+            });
+
+            Encuesta_Elegida = Encuesta_ID;
+            $("#Modal_Visualizar_Encuesta").modal("show")
+
+        }
+
+        function Ver_Respuestas_De_Usuario(Respuestas_ID) {
+
+
+            var Encuesta = Encuestas.find(x => x.id == Encuesta_Elegida);
+
+            var Datos_Respuestas = Encuesta.respuestas.find(x => x.id == Respuestas_ID);
+            //<ol id="Lista_Respuestas_Usuario">
+            //    <li>
+            //        <b><label>¿Quién es Yeison?</label></b>
+            //        <p><q>La para</q></p>
+            //    </li>
+
+            $("#Lista_Respuestas_Usuario").html("");
+
+            $.each(Datos_Respuestas.get_Respuestas, function (i, item) {
+
+                var model = `
+                <li>
+                    <b><label>${item.pregunta}</label></b>
+                    <p><q>${item.respuesta_Text}</q></p>
+                </li>`;
+                $("#Lista_Respuestas_Usuario").append(model);
+
+            });
+
+            $("#Usuario_Encuestado").text(Datos_Respuestas.nombre_Encuestado);
+            $("#Fecha_De_Envio").text(moment(Datos_Respuestas.fecha_Completada).format("lll"));
+
+            $("#Modal_Visualizar_Encuesta").modal("hide")
+            $("#Modal_Respuestas_Usuario").modal("show")
+
+        }
+    </script>
+
+} 

@@ -160,13 +160,29 @@ namespace EncuestadorApp.Logic1.Controllers
                         ID = x.ID,
                         Nombre_Encuestado = x.Nombre_Encuestado,
                         Fecha_Completada = x.Fecha_Completada,
-                        Get_Respuestas = (List<Respuesta>)x.Get_Respuestas.Select(x => new Respuesta { Pregunta = x.Pregunta, Respuesta_Text = x.Respuesta_Text})
+                        Get_Respuestas = (List<Respuesta>)x.Get_Respuestas.Select(x => new Respuesta {
+                            ID = x.ID, Pregunta = x.Pregunta, Respuesta_Text = x.Respuesta_Text})
                         
                     })
 
                 }).ToList();
 
             return Json(new { Lista_Encuestas });
+        }
+
+        public JsonResult Obtener_Respuestas()
+        {
+
+            //var respuestas = db.Respuestas_Por_Usuario.Include(x => x.Get_Respuestas).Select(
+            //    x => new Respuesta_Por_Usuario
+            //    {
+            //        Get_Respuestas = (List<Respuesta>)x.Get_Respuestas.Select(x => new Respuesta { Pregunta = x.Pregunta, Respuesta_Text = x.Respuesta_Text})
+            //    }
+            //    ).ToList();
+
+
+            var respuestas = db.Respuestas.ToList();
+            return Json(respuestas);
         }
 
         public JsonResult Preguntas_Encuesta(int Id_Encuestas)
@@ -181,11 +197,35 @@ namespace EncuestadorApp.Logic1.Controllers
         }
         public JsonResult Elimnar_Encuesta (int Id_Encuestas)
         {
-            var encuesta = db.Encuestas.Find(Id_Encuestas);
-
-            if(encuesta != null)
+            var Encuesta_Eliminar = db.Encuestas.Where(x => x.ID == Id_Encuestas).Include(x => x.Preguntas).Include(x => x.Respuestas).Select(x => new Encuesta
             {
-                db.Encuestas.Remove(encuesta);
+                
+                ID = x.ID,
+                Titulo = x.Titulo,
+                Creador_Nombre = x.Creador_Nombre,
+                Fecha_Creacion = x.Fecha_Creacion,
+                Preguntas = (List<Pregunta>)x.Preguntas.Select(x => new Pregunta
+                {
+                    Descripcion = x.Descripcion,
+                    ID = x.ID,
+                    
+                }),
+                Respuestas = (List<Respuesta_Por_Usuario>)x.Respuestas.Select(x => new Respuesta_Por_Usuario
+                {
+                    Fecha_Completada = x.Fecha_Completada,
+                    ID = x.ID,
+                    Nombre_Encuestado = x.Nombre_Encuestado,
+                    
+                    Get_Respuestas = (List<Respuesta>)x.Get_Respuestas.Select(x => new Respuesta { Pregunta = x.Pregunta, Respuesta_Text = x.Respuesta_Text, ID = x.ID, Respuestas_ID = x.Respuestas_ID })
+                })
+
+            }).FirstOrDefault();
+
+            
+
+            if (Encuesta_Eliminar != null)
+            {
+                db.Encuestas.Remove(Encuesta_Eliminar);
                 db.SaveChanges();
                 return Json(new { title = "Encuesta", text = "Encuesta eliminada exitósamente", icon = "success" });
 
@@ -228,7 +268,17 @@ namespace EncuestadorApp.Logic1.Controllers
             return Json(new { title = "Encuestas", text = "Sus respuestas fueron enviadas exitósamente", icon = "success" });
         }
 
-        
+        public JsonResult Get_Encuesta()
+        {
+
+            var Encuesta_Eliminar = db.Encuestas.Select(x => new Encuesta { ID = x.ID }).ToList();
+            var Preguntas = db.Preguntas.Select(x => new Pregunta { ID = x.ID }).ToList();
+            var Respuestas_Por_Usuario = db.Respuestas_Por_Usuario.Select(x => new Respuesta_Por_Usuario { ID = x.ID }).ToList();
+            var Respuestas = db.Respuestas.Select(x => new Respuesta { ID = x.ID }).ToList();
+
+
+            return Json(new { Encuesta_Eliminar, Preguntas, Respuestas_Por_Usuario, Respuestas });
+        }
 
 
     }

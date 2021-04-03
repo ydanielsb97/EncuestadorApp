@@ -1,5 +1,5 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Inicio";
 }
 
 <style>
@@ -226,6 +226,8 @@
                     icon: result.icon
                 })
                 Obtener_Encuestas();
+                $("#Div_Preguntas").html("");
+                $("#Cantidad_Preguntas").val(0);
                 $("#Modal_Crear_Encuesta").modal("hide");
 
             });
@@ -317,6 +319,7 @@
 
             var data = { Id_Encuestas: Id_Encuesta };
 
+            console.log(data)
             $.post("/Encuestas/Elimnar_Encuesta", data).done(function (result) {
 
 

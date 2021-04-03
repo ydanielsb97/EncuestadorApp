@@ -121,8 +121,8 @@
 
         $("#Form_Aplicar_Encuesta").submit(function () {
 
-            //$("#Btn_Enviar").attr("hidden", true);
-            //$("#Loading_Enviar").removeAttr("hidden");
+            $("#Btn_Enviar").attr("hidden", true);
+            $("#Loading_Enviar").removeAttr("hidden");
 
             var Lista_Respuestas = []
 
@@ -136,8 +136,9 @@
 
             var data = { Nombre_Usuario: $("#Nombre_Encuestado").val(), Encuesta_ID: Encuesta_Seleccionada_ID, Respuestas: Lista_Respuestas }
 
+            console.log(data)
 
-            $.get("/Encuestas/Enviar_Respuestas", data).done(function (result) {
+            $.post("/Encuestas/Enviar_Respuestas", data).done(function (result) {
 
                 Swal.fire({
 
