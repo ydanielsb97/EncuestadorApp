@@ -58,6 +58,36 @@ namespace EncuestadorApp.Logic1.Controllers
             return Json(new { title = "Encuesta", text = "Encuesta creada exitósamente", icon = "success" });
         }
 
+
+        public JsonResult Guardar_Edicion_Encuesta(List<Pregunta> Lista_Preguntas)
+        {
+            var Usuario_Loguedo = db.Users.Find(User.FindFirstValue(ClaimTypes.NameIdentifier));
+
+            //var Cant_Encuestas = db.Encuestas.Count() + 1;
+
+            //var Model_Encuesta = new Encuesta
+            //{
+            //    Creador_Nombre = $"{Usuario_Loguedo.Nombres} {Usuario_Loguedo.Apellidos}",
+            //    Titulo = $"Encuesta #{Cant_Encuestas}",
+            //    Fecha_Creacion = DateTime.Now,
+            //    Creador_ID = Usuario_Loguedo.Id
+            //};
+
+            //db.Encuestas.Add(Model_Encuesta);
+            //db.SaveChanges();
+
+            foreach (var item in Lista_Preguntas)
+            {
+
+                var pregunta = db.Preguntas.Find(item.ID);
+
+                pregunta.Descripcion = item.Descripcion;
+
+                db.SaveChanges();
+            }
+
+            return Json(new { title = "Encuesta", text = "Encuesta editada exitósamente", icon = "success" });
+        }
         public JsonResult Obtener_Encuesta()
         {
 

@@ -41,6 +41,7 @@ namespace EncuestadorApp.Data.Models
 
     public class Pregunta_Form
     {
+        public int ID { get; set; }
         public string Pregunta { get; set; }
     }
 

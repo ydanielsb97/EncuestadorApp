@@ -4,10 +4,9 @@
 
 <style>
 
-    a:hover{
+    a:hover {
         cursor: pointer;
     }
-
 </style>
 <div class="row mb-4">
 
@@ -28,14 +27,14 @@
 
     <div class="col-12" id="Encuestas_Div">
         @*<div class="col-12">
-            <a class="btn btn-light btn-block mb-3">Encuesta #1</a>
-        </div>
-        <div class="col-12">
-            <a class="btn btn-light btn-block mb-3">Encuesta #1</a>
-        </div>
-        <div class="col-12">
-            <a class="btn btn-light btn-block mb-3">Encuesta #1</a>
-        </div>*@
+                <a class="btn btn-light btn-block mb-3">Encuesta #1</a>
+            </div>
+            <div class="col-12">
+                <a class="btn btn-light btn-block mb-3">Encuesta #1</a>
+            </div>
+            <div class="col-12">
+                <a class="btn btn-light btn-block mb-3">Encuesta #1</a>
+            </div>*@
     </div>
 </div>
 
@@ -76,9 +75,9 @@
                     <form id="Form_Preguntas">
                         <div class="row" id="Div_Preguntas">
                             @*<div class="col-10">
-                                <label for="Pregunta1">Pregunta #1</label>
-                                <input class="form-control" name="Pregunta1" id="Pregunta1" placeholder="Introduzca la pregunta #1" required>
-                            </div>*@
+                                    <label for="Pregunta1">Pregunta #1</label>
+                                    <input class="form-control" name="Pregunta1" id="Pregunta1" placeholder="Introduzca la pregunta #1" required>
+                                </div>*@
                         </div>
                     </form>
                 </div>
@@ -106,12 +105,13 @@
 
                 <div id="Div_Preguntas_Encuesta">
 
-                    
 
 
-         
+
+
                 </div>
-                
+
+
             </div>
             <div class="modal-footer" id="Footer_Ver_Encuesta">
                 @*<button type="button" class="btn btn-primary" data-dismiss="modal">Editar</button>*@
@@ -121,6 +121,31 @@
     </div>
 </div>
 
+
+<div class="modal fade" id="Modal_Editar_Encuesta" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="Modal_Editar_EncuestaLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="Modal_Editar_Encuesta_Label">Editar Encuesta</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+
+                <div class="row" id="Div_Editar_Encuesta">
+
+
+                </div>
+
+            </div>
+            <div class="modal-footer" id="Footer_Ver_Encuesta">
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Cancelar</button>
+                <button onclick="Editar_Encuesta()" type="button" class="btn btn-success" form="Form_Preguntas">Guardar</button>
+            </div>
+        </div>
+    </div>
+</div>
 @section Scripts{
 
 
@@ -132,6 +157,12 @@
 
         var cantidad_Preguntas_Digitada;
         var Encuestas = [];
+
+        var Preguntas_Edit = [];
+
+        var Encuesta_A_Editar;
+
+
         $("#Form_Crear_Encuesta").submit(function () {
 
             $("#Div_Preguntas").html("");
@@ -143,10 +174,10 @@
             for (var i = 0; i < cantidad_Preguntas_Digitada; i++) {
 
                 var pregunta = `
-                            <div class="col-10">
-                                <label for="Pregunta${i+1}">Pregunta #${i + 1}</label>
-                                <input class="form-control" name="Pregunta${i + 1}" id="Pregunta${i + 1}" placeholder="Introduzca la pregunta #${i + 1}" required>
-                            </div>`;
+                                <div class="col-10">
+                                    <label for="Pregunta${i + 1}">Pregunta #${i + 1}</label>
+                                    <input class="form-control" name="Pregunta${i + 1}" id="Pregunta${i + 1}" placeholder="Introduzca la pregunta #${i + 1}" required>
+                                </div>`;
 
                 $("#Div_Preguntas").append(pregunta);
 
@@ -200,9 +231,9 @@
                     var fecha = moment(item.fecha_Creacion).format("lll");
 
                     var model = `
-                    <div class="col-12">
-                         <a onclick="Preguntas_Encuesta(${item.id})" class="btn btn-light btn-block mb-3">Encuesta #${i + 1} - ${item.titulo} - ${fecha}</a>
-                    </div>`;
+                        <div class="col-12">
+                             <a onclick="Preguntas_Encuesta(${item.id})" class="btn btn-light btn-block mb-3">Encuesta #${i + 1} - ${item.titulo} - ${fecha}</a>
+                        </div>`;
 
 
                     $("#Encuestas_Div").append(model);
@@ -218,18 +249,19 @@
 
         function Preguntas_Encuesta(Id_Encuestas) {
 
-            var data = { Id_Encuestas: Id_Encuestas}
+            var data = { Id_Encuestas: Id_Encuestas }
 
             $("#Div_Preguntas_Encuesta").html("");
 
             $.get("/Encuestas/Preguntas_Encuesta", data).done(function (result) {
 
+                Preguntas_Edit = result.preguntas;
 
                 console.log(result);
                 $.each(result.preguntas, function (i, item) {
 
                     var model = `
-                    <p class="">${item.descripcion}</p>`;
+                        <p class="">${item.descripcion}</p>`;
 
                     $("#Div_Preguntas_Encuesta").append(model);
 
@@ -241,10 +273,10 @@
             $("#Footer_Ver_Encuesta").html("");
 
             var button_Eliminar = `
-            <button onclick="Elimnar_Encuesta(${Id_Encuestas})" type="button" class="btn btn-danger">Eliminar</button>`;
+                <button onclick="Elimnar_Encuesta(${Id_Encuestas})" type="button" class="btn btn-danger">Eliminar</button>`;
 
             var button_Editar = `
-            <button type="button" class="btn btn-primary" data-dismiss="modal">Editar</button>`;
+                <button type="button" class="btn btn-primary" onclick="Abrir_Edicion_Encuesta(${Id_Encuestas})">Editar</button>`;
 
             $("#Footer_Ver_Encuesta").append(button_Eliminar)
             $("#Footer_Ver_Encuesta").append(button_Editar)
@@ -273,6 +305,59 @@
                 Obtener_Encuestas()
 
             });
+        }
+
+        function Abrir_Edicion_Encuesta(Id_Encuestas) {
+            $("#Div_Editar_Encuesta").html("");
+
+            Encuesta_A_Editar = Id_Encuestas;
+
+            $.each(Preguntas_Edit, function (i, item) {
+
+
+
+                var pregunta = `
+                     <div class="col-10">
+                        <label for="Pregunta${i + 1}">Pregunta #${i + 1}</label>
+                        <input class="form-control" value="${item.descripcion}" name="PreguntaInput${i + 1}" id="PreguntaInput${i + 1}" required>
+                      </div>`;
+
+
+                console.log(item.descripcion)
+
+                $("#Div_Editar_Encuesta").append(pregunta);
+
+            });
+
+            $("#Modal_Ver_Encuesta").modal("hide");
+            $("#Modal_Editar_Encuesta").modal("show");
+
+        }
+
+        function Editar_Encuesta() {
+
+            $.each(Preguntas_Edit, function (i, item) {
+
+                var val_Pregunta = $(`#PreguntaInput${i + 1}`).val();
+
+                item.descripcion = val_Pregunta;
+
+            });
+
+
+            var data = { Lista_Preguntas: Preguntas_Edit };
+            console.log(data)
+
+            $.post("/Encuestas/Guardar_Edicion_Encuesta", data).done(function (result) {
+
+                Swal.fire({
+                    title: result.title,
+                    text: result.text,
+                    icon: result.icon
+                })
+
+            });
+
         }
     </script>
 
