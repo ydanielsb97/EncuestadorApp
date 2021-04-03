@@ -132,8 +132,17 @@
                 </button>
             </div>
             <div class="modal-body">
+                <div class="row">
+                    <div class="col-3">
 
-                <div class="row" id="Div_Editar_Encuesta">
+                        <button onclick="Agregar_Pregunta()" class="btn btn-success mb-2">Agregar Pregunta</button>
+
+                    </div>
+
+                </div>
+
+                <hr />
+                <div class="row" id="Div_Editar_Encuesta" style="max-height:500px; overflow-y:scroll;">
 
 
                 </div>
@@ -162,6 +171,7 @@
 
         var Encuesta_A_Editar;
 
+        var Cantidad_Preguntas_Edit = 0;
 
         $("#Form_Crear_Encuesta").submit(function () {
 
@@ -179,7 +189,8 @@
                                     <input class="form-control" name="Pregunta${i + 1}" id="Pregunta${i + 1}" placeholder="Introduzca la pregunta #${i + 1}" required>
                                 </div>`;
 
-                $("#Div_Preguntas").append(pregunta);
+                $("#Div_Preguntas").append(pregunta)
+            
 
             };
             Obtener_Encuestas()
@@ -210,6 +221,8 @@
                     text: result.text,
                     icon: result.icon
                 })
+                Obtener_Encuestas();
+                $("#Modal_Crear_Encuesta").modal("hide");
 
             });
 
@@ -317,10 +330,18 @@
 
 
                 var pregunta = `
+                <div class="col-12" id="Div_Pregunta${i + 1}">
+                    <div class="row">
                      <div class="col-10">
                         <label for="Pregunta${i + 1}">Pregunta #${i + 1}</label>
                         <input class="form-control" value="${item.descripcion}" name="PreguntaInput${i + 1}" id="PreguntaInput${i + 1}" required>
-                      </div>`;
+                      </div>
+                    <div class="col-2" style="margin-top: 32px;">
+                        <button class="btn btn-danger" onclick="Eliminar_Pregunta(Div_Pregunta${i + 1}, ${item.id})">Eliminar</buttom>
+                    </div>
+                    </div>
+                </div>`;
+
 
 
                 console.log(item.descripcion)
@@ -328,6 +349,8 @@
                 $("#Div_Editar_Encuesta").append(pregunta);
 
             });
+
+            Cantidad_Preguntas_Edit = Preguntas_Edit.length;
 
             $("#Modal_Ver_Encuesta").modal("hide");
             $("#Modal_Editar_Encuesta").modal("show");
@@ -345,7 +368,7 @@
             });
 
 
-            var data = { Lista_Preguntas: Preguntas_Edit };
+            var data = { Encuesta_ID: Encuesta_A_Editar, Lista_Preguntas: Preguntas_Edit };
             console.log(data)
 
             $.post("/Encuestas/Guardar_Edicion_Encuesta", data).done(function (result) {
@@ -355,6 +378,87 @@
                     text: result.text,
                     icon: result.icon
                 })
+                $("#Modal_Editar_Encuesta").modal("hide");
+            });
+
+        }
+
+        function Agregar_Pregunta() {
+
+            Cantidad_Preguntas_Edit++;
+
+            console.log(Preguntas_Edit)
+//            var pregunta = `
+//                    <div class="col-12" id="Div_Pregunta${Cantidad_Preguntas_Edit}">
+                    
+//                        <div class="row">
+                    
+//                         <div class="col-10">
+//                            <label for="Pregunta${Cantidad_Preguntas_Edit}">Pregunta #${Cantidad_Preguntas_Edit}</label>
+//                            <input class="form-control" name="PreguntaInput${Cantidad_Preguntas_Edit}" id="PreguntaInput${Cantidad_Preguntas_Edit}" placeholder="Introduzca la pregunta" required>
+//                          </div>
+//                          <div class="col-2" style="margin-top: 32px;">
+//                             <button class="btn btn-danger" onclick="Eliminar_Pregunta(Div_Pregunta${Cantidad_Preguntas_Edit})">Eliminar</buttom>
+//                         </div>
+            
+
+//                        </div>
+
+//                    </div>
+
+//`;
+
+//            $("#Div_Editar_Encuesta").append(pregunta);
+
+            var numero_ID = Math.floor((Math.random() * 123456789));
+            var pregunta_Edit = {id: numero_ID,  descripcion: "" };
+
+            Preguntas_Edit.push(pregunta_Edit);
+
+            Reiniciar_Campos_Edit()
+
+        }
+
+        function Eliminar_Pregunta(Id_Div, Id_Pregunta) {
+
+            Cantidad_Preguntas_Edit--;
+
+            var pregunta = Preguntas_Edit.find(x => x.id == Id_Pregunta);
+
+            var Indice = Preguntas_Edit.indexOf(pregunta)
+            Preguntas_Edit.splice(Indice, 1)
+
+            console.log(Preguntas_Edit)
+            Reiniciar_Campos_Edit()
+            //Id_Div.remove();
+
+        }
+
+        function Reiniciar_Campos_Edit() {
+
+            $("#Div_Editar_Encuesta").html("");
+            $.each(Preguntas_Edit, function (i, item) {
+
+
+
+                var pregunta = `
+                <div class="col-12" id="Div_Pregunta${i + 1}">
+                    <div class="row">
+                     <div class="col-10">
+                        <label for="Pregunta${i + 1}">Pregunta #${i + 1}</label>
+                        <input class="form-control" value="${item.descripcion}" name="PreguntaInput${i + 1}" id="PreguntaInput${i + 1}" required>
+                      </div>
+                    <div class="col-2" style="margin-top: 32px;">
+                        <button class="btn btn-danger" onclick="Eliminar_Pregunta(Div_Pregunta${i + 1}, ${item.id})">Eliminar</buttom>
+                    </div>
+                    </div>
+                </div>`;
+
+
+
+                console.log(item.descripcion)
+
+                $("#Div_Editar_Encuesta").append(pregunta);
 
             });
 

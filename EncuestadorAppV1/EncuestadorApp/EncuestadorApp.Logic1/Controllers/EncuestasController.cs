@@ -59,9 +59,11 @@ namespace EncuestadorApp.Logic1.Controllers
         }
 
 
-        public JsonResult Guardar_Edicion_Encuesta(List<Pregunta> Lista_Preguntas)
+        public JsonResult Guardar_Edicion_Encuesta(int Encuesta_ID, List<Pregunta> Lista_Preguntas)
         {
             var Usuario_Loguedo = db.Users.Find(User.FindFirstValue(ClaimTypes.NameIdentifier));
+
+            var Todas_Las_Preguntas = db.Preguntas.Where(x => x.Encuesta_ID == Encuesta_ID).ToList();
 
             //var Cant_Encuestas = db.Encuestas.Count() + 1;
 
@@ -76,14 +78,53 @@ namespace EncuestadorApp.Logic1.Controllers
             //db.Encuestas.Add(Model_Encuesta);
             //db.SaveChanges();
 
+            foreach (var item in Todas_Las_Preguntas)
+            {
+
+                var existe = Lista_Preguntas.Exists(x => x.ID == item.ID);
+
+                if (existe)
+                {
+
+                    var pregunta = Lista_Preguntas.Where(x => x.ID == item.ID).FirstOrDefault();
+
+                    item.Descripcion = pregunta.Descripcion;
+                    db.SaveChanges();
+                }
+                else
+                {
+                    db.Preguntas.Remove(item);
+                    db.SaveChanges();
+                }
+
+
+            }
+
+
+
             foreach (var item in Lista_Preguntas)
             {
 
                 var pregunta = db.Preguntas.Find(item.ID);
 
-                pregunta.Descripcion = item.Descripcion;
+                if (pregunta != null)
+                {
 
-                db.SaveChanges();
+                    pregunta.Descripcion = item.Descripcion;
+                    db.SaveChanges();
+                }
+                else
+                {
+                    var model = new Pregunta
+                    {
+
+                        Descripcion = item.Descripcion,
+                        Encuesta_ID = Encuesta_ID,
+                    };
+
+                    db.Preguntas.Add(model);
+                    db.SaveChanges();
+                }
             }
 
             return Json(new { title = "Encuesta", text = "Encuesta editada exitósamente", icon = "success" });
