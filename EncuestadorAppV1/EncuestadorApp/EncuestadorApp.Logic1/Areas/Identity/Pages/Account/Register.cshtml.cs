@@ -47,19 +47,26 @@ namespace EncuestadorApp.Logic1.Areas.Identity.Pages.Account
         public class InputModel
         {
             [Required]
-            [EmailAddress]
-            [Display(Name = "Email")]
-            public string Email { get; set; }
+            [Display(Name = "Nombres")]
+            public string Nombres { get; set; }
 
             [Required]
-            [StringLength(100, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 6)]
+            [Display(Name = "Apellidos")]
+            public string Apellidos { get; set; }
+
+            [Required]
+            [Display(Name = "Usuario")]
+            public string userName { get; set; }
+
+            [Required]
+            [StringLength(100, ErrorMessage = "La contraseña debe contener mínimo 4 caracteres.", MinimumLength = 4)]
             [DataType(DataType.Password)]
-            [Display(Name = "Password")]
+            [Display(Name = "Contraseña")]
             public string Password { get; set; }
 
             [DataType(DataType.Password)]
             [Display(Name = "Confirm password")]
-            [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
+            [Compare("Password", ErrorMessage = "La contraseña y su confirmación no coinciden.")]
             public string ConfirmPassword { get; set; }
         }
 
@@ -75,7 +82,7 @@ namespace EncuestadorApp.Logic1.Areas.Identity.Pages.Account
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
             if (ModelState.IsValid)
             {
-                var user = new ApplicationUser { UserName = Input.Email, Email = Input.Email };
+                var user = new ApplicationUser { UserName = Input.userName, Nombres = Input.Nombres, Apellidos = Input.Apellidos, Email = "correo@mail.com" , EmailConfirmed = true };
                 var result = await _userManager.CreateAsync(user, Input.Password);
                 if (result.Succeeded)
                 {
@@ -89,18 +96,25 @@ namespace EncuestadorApp.Logic1.Areas.Identity.Pages.Account
                         values: new { area = "Identity", userId = user.Id, code = code, returnUrl = returnUrl },
                         protocol: Request.Scheme);
 
-                    await _emailSender.SendEmailAsync(Input.Email, "Confirm your email",
-                        $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
 
-                    if (_userManager.Options.SignIn.RequireConfirmedAccount)
-                    {
-                        return RedirectToPage("RegisterConfirmation", new { email = Input.Email, returnUrl = returnUrl });
-                    }
-                    else
-                    {
+
+                        //await _emailSender.SendEmailAsync(Input.Email, "Confirm your email",
+                        //    $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
+
+                        //if (_userManager.Options.SignIn.RequireConfirmedAccount)
+                        //{
+                        //    return RedirectToPage("RegisterConfirmation", new { email = Input.Email, returnUrl = returnUrl });
+                        //}
+                        //else
+                        //{
+                        //    await _signInManager.SignInAsync(user, isPersistent: false);
+                        //    return LocalRedirect(returnUrl);
+                        //}
+
+
                         await _signInManager.SignInAsync(user, isPersistent: false);
                         return LocalRedirect(returnUrl);
-                    }
+
                 }
                 foreach (var error in result.Errors)
                 {

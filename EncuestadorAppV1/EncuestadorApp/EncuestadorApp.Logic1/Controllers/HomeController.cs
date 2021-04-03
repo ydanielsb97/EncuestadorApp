@@ -1,6 +1,7 @@
 ﻿using EncuestadorApp.Data.Data;
 using EncuestadorApp.Data.Models;
 using EncuestadorApp.Logic1.Data;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
@@ -11,6 +12,7 @@ using System.Threading.Tasks;
 
 namespace EncuestadorApp.Logic1.Controllers
 {
+    [Authorize]
     public class HomeController : Controller
     {
         private readonly ApplicationDbContext db;

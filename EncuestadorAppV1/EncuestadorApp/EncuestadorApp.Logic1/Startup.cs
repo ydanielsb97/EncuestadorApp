@@ -62,7 +62,7 @@ namespace EncuestadorApp.Logic1
                 // User settings.
                 options.User.AllowedUserNameCharacters =
                 "abcdefghijklmnñopqrstuvwxyzABCDEFGHIJKLMNÑOPQRSTUVWXYZ0123456789-._@+";
-                options.User.RequireUniqueEmail = true;
+                options.User.RequireUniqueEmail = false;
             });
         }
 
